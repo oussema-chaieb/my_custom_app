@@ -5,6 +5,13 @@ app_description = "Let\'s try Description here"
 app_email = "oussemachaieb7@gmail.com"
 app_license = "mit"
 
+# Splash Image
+app_logo_url = "/assets/my_custom_app/img/my_logo.png"
+
+website_context = {
+    "favicon": "/assets/my_custom_app/img/my_logo.png",
+    "splash_image": "/assets/my_custom_app/img/my_logo.png"
+}
 # Apps
 # ------------------
 
