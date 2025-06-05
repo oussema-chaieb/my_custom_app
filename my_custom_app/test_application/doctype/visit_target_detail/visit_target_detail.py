@@ -7,8 +7,8 @@ from frappe.utils import cint, cstr
 
 
 class VisitTargetDetail(Document):
-	def before_save(self):
-		# Check if both customer and territory fields are empty or None
+    def before_save(self):
+        # Check if both customer and territory fields are empty or None
         customer = self.get("customer")
         territory = self.get("territory") # Use the correct field name
 
