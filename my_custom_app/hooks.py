@@ -12,6 +12,26 @@ website_context = {
     "favicon": "/assets/my_custom_app/img/my_logo.png",
     "splash_image": "/assets/my_custom_app/img/my_logo.png"
 }
+
+fixtures = [
+    {
+        "dt": "Workspace", 
+        "filters": [
+            # Use the *current* name of the workspace you edited
+            ["name", "=", "Settings"] 
+        ]
+        # You could add more filters here if you modified other specific Workspaces
+        # Example: ["name", "in", ["Settings", "Another Custom Workspace"]]
+    },
+    {
+        "dt": "Custom Field", # Add this entry
+        "filters": [
+            ["dt", "=", "Sales Person"] # Filter by the DocType they belong to
+        ]
+    }
+    # Add other DocTypes here if needed
+]
+
 # Apps
 # ------------------
 

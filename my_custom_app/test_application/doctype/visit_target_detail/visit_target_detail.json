@@ -1,0 +1,59 @@
+{
+ "actions": [],
+ "creation": "2025-06-05 04:48:48.748108",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "customer",
+  "territory",
+  "goal_number_of_visits",
+  "completed_visits"
+ ],
+ "fields": [
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "label": "Customer",
+   "options": "Customer",
+   "search_index": 1
+  },
+  {
+   "fieldname": "territory",
+   "fieldtype": "Link",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "label": "Territory",
+   "options": "Territory"
+  },
+  {
+   "fieldname": "goal_number_of_visits",
+   "fieldtype": "Int",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "label": "Goal number of visits"
+  },
+  {
+   "fieldname": "completed_visits",
+   "fieldtype": "Int",
+   "in_filter": 1,
+   "in_list_view": 1,
+   "label": "Completed visits"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-06-05 05:23:59.735882",
+ "modified_by": "Administrator",
+ "module": "Test Application",
+ "name": "Visit Target Detail",
+ "owner": "oussemachaieb7@gmail.com",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
