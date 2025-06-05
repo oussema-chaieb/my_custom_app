@@ -1,31 +1,35 @@
-frappe.ui.form.on('Visit Target Detail', {
-    // Trigger when the period_type field changes
+// Place this in my_custom_app/my_custom_app/doctype/visit_target_detail/visit_target_detail.js
+frappe.ui.form.on("Visit Target Detail", {
+    // Event triggered when "period_type" changes IN THIS ROW
     period_type: function(frm, cdt, cdn) {
-        console.log("Period Type Changed for row:", cdn); // Log entry point
+        console.log("Visit Target Detail Script: Period Type Changed for row:", cdn); // Log entry point
 
         let row = locals[cdt][cdn];
         let period_type = row.period_type;
         let start_date = null;
         let end_date = null;
-        let today = frappe.datetime.now_date();
+        let today_moment = moment(); // Use moment.js
         let read_only = 0;
-        let child_table_fieldname = "custom_number_visit_target"; // Confirm this is correct
+        // We need the parent's fieldname for the table to refresh it
+        // Get it from the grid object if possible, otherwise hardcode (less ideal)
+        let grid = frm.fields_dict[row.parentfield]?.grid; // Get grid object via parentfield
+        let child_table_fieldname = row.parentfield || "custom_number_visit_target"; // Default if needed
 
-        console.log("Selected Period Type:", period_type); // Log selected type
+        console.log("Visit Target Detail Script: Selected Period Type:", period_type); // Log selected type
 
-        if (period_type === 'Current Month') {
-            start_date = frappe.datetime.start_of(today, "month");
-            end_date = frappe.datetime.end_of(today, "month");
+        if (period_type === "Current Month") {
+            start_date = today_moment.startOf("month").format("YYYY-MM-DD");
+            end_date = today_moment.endOf("month").format("YYYY-MM-DD");
             read_only = 1;
-        } else if (period_type === 'Current Quarter') {
-            start_date = frappe.datetime.start_of(today, "quarter");
-            end_date = frappe.datetime.end_of(today, "quarter");
+        } else if (period_type === "Current Quarter") {
+            start_date = today_moment.startOf("quarter").format("YYYY-MM-DD");
+            end_date = today_moment.endOf("quarter").format("YYYY-MM-DD");
             read_only = 1;
-        } else if (period_type === 'Next 30 Days') {
-            start_date = today;
-            end_date = frappe.datetime.add_days(today, 30);
+        } else if (period_type === "Next 30 Days") {
+            start_date = today_moment.format("YYYY-MM-DD"); // Today
+            end_date = today_moment.add(30, "days").format("YYYY-MM-DD");
             read_only = 1;
-        } else if (period_type === 'Custom Range') {
+        } else if (period_type === "Custom Range") {
             start_date = row.start_date || null;
             end_date = row.end_date || null;
             read_only = 0;
@@ -35,58 +39,42 @@ frappe.ui.form.on('Visit Target Detail', {
             read_only = 0;
         }
 
-        console.log("Calculated Start Date:", start_date); // Log calculated dates
-        console.log("Calculated End Date:", end_date);
+        console.log("Visit Target Detail Script: Calculated Start Date:", start_date);
+        console.log("Visit Target Detail Script: Calculated End Date:", end_date);
 
         // Set the values in the child table row
-        frappe.model.set_value(cdt, cdn, 'start_date', start_date);
-        frappe.model.set_value(cdt, cdn, 'end_date', end_date);
+        // Use flags to prevent immediate refresh triggering infinite loops
+        frm.setting_child_value = true;
+        frappe.model.set_value(cdt, cdn, "start_date", start_date);
+        frappe.model.set_value(cdt, cdn, "end_date", end_date);
+        frm.setting_child_value = false;
 
-        console.log("Values set for row:", cdn);
+        console.log("Visit Target Detail Script: Values set for row:", cdn);
 
-        // Refresh the row/table to show changes immediately
-        console.log("Refreshing table field:", child_table_fieldname);
-        frm.refresh_field(child_table_fieldname);
+        // Refresh the specific row fields
+        let grid_row = grid?.grid_rows_by_docname[cdn];
+        if (grid_row) {
+             grid_row.refresh_field("start_date");
+             grid_row.refresh_field("end_date");
+             console.log("Visit Target Detail Script: Row fields refreshed for:", cdn);
+        } else {
+            // Fallback: Refresh the whole table on the parent form
+            console.log("Visit Target Detail Script: Refreshing parent table field:", child_table_fieldname);
+            frm.refresh_field(child_table_fieldname);
+        }
 
         // Set read-only status
-        console.log("Attempting to set read-only status...");
-        try {
-            if (frm.fields_dict[child_table_fieldname] && frm.fields_dict[child_table_fieldname].grid.grid_rows_by_docname[cdn]) {
-                 frm.fields_dict[child_table_fieldname].grid.grid_rows_by_docname[cdn].toggle_editable('start_date', !read_only);
-                 frm.fields_dict[child_table_fieldname].grid.grid_rows_by_docname[cdn].toggle_editable('end_date', !read_only);
-                 console.log("Read-only status set for row:", cdn);
-            } else {
-                 console.log("Could not find grid row to set read-only status for row:", cdn);
+        console.log("Visit Target Detail Script: Attempting to set read-only status...");
+        if (grid_row) {
+            try {
+                 grid_row.toggle_editable("start_date", !read_only);
+                 grid_row.toggle_editable("end_date", !read_only);
+                 console.log("Visit Target Detail Script: Read-only status set for row:", cdn);
+            } catch (e) {
+                console.error("Visit Target Detail Script: Error setting read-only status:", e);
             }
-        } catch (e) {
-            console.error("Error setting read-only status:", e); // Log errors
+        } else {
+             console.log("Visit Target Detail Script: Could not find grid row to set read-only status for row:", cdn);
         }
     },
-
-    // Apply read-only on refresh for existing rows
-    refresh: function(frm) {
-        console.log("Refresh trigger called for Sales Person form"); // Log refresh
-        let child_table_fieldname = "custom_number_visit_target"; // Confirm this is correct
-        let grid = frm.fields_dict[child_table_fieldname] ? frm.fields_dict[child_table_fieldname].grid : null;
-        if (grid && frm.doc[child_table_fieldname]) {
-            console.log("Processing existing rows on refresh...");
-            frm.doc[child_table_fieldname].forEach(function(row) {
-                let grid_row = grid.grid_rows_by_docname[row.name];
-                if (grid_row) {
-                    let read_only = (['Current Month', 'Current Quarter', 'Next 30 Days'].includes(row.period_type));
-                    console.log("Setting read-only for existing row:", row.name, "Read Only:", read_only);
-                    try {
-                        grid_row.toggle_editable('start_date', !read_only);
-                        grid_row.toggle_editable('end_date', !read_only);
-                    } catch (e) {
-                         console.error("Error setting read-only status on refresh for row:", row.name, e);
-                    }
-                } else {
-                    console.log("Could not find grid row on refresh for row:", row.name);
-                }
-            });
-        } else {
-             console.log("No grid or no child table data found on refresh.");
-        }
-    }
 });
