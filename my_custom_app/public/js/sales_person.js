@@ -1,4 +1,3 @@
-// Place this in my_custom_app/my_custom_app/doctype/visit_target_detail/visit_target_detail.js
 frappe.ui.form.on("Visit Target Detail", {
     // Event triggered when "period_type" changes IN THIS ROW
     period_type: function(frm, cdt, cdn) {
