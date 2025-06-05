@@ -15,15 +15,6 @@ website_context = {
 
 fixtures = [
     {
-        "dt": "Workspace", 
-        "filters": [
-            # Use the *current* name of the workspace you edited
-            ["name", "=", "Settings"] 
-        ]
-        # You could add more filters here if you modified other specific Workspaces
-        # Example: ["name", "in", ["Settings", "Another Custom Workspace"]]
-    },
-    {
         "dt": "Custom Field", # Add this entry
         "filters": [
             ["dt", "=", "Sales Person"] # Filter by the DocType they belong to
@@ -164,13 +155,12 @@ fixtures = [
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-# 	}
-# }
+doc_events = {
+    "Sales Person": {
+        "before_save": "my_custom_app.overrides.sales_person_validation.check_visit_target_details"
+    }
+    # Remove any old entries for "Visit Target Detail" hooks if they exist
+}
 
 # Scheduled Tasks
 # ---------------
