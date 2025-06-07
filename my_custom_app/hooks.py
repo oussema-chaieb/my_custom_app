@@ -169,7 +169,8 @@ doc_events = {
         "before_save": "my_custom_app.overrides.sales_person_validation.check_visit_target_details"
     },
     "Landed Cost Voucher": {
-        "before_save": "my_custom_app.overrides.landed_cost_voucher.custom_distribute_charges_by_ngp"
+        "before_save": "my_custom_app.overrides.landed_cost_voucher.custom_distribute_charges_by_ngp",
+        "before_submit": "my_custom_app.overrides.landed_cost_voucher.custom_distribute_charges_by_ngp"
     }
 }
 
