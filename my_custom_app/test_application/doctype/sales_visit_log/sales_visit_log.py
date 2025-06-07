@@ -9,17 +9,17 @@ class SalesVisitLog(Document):
         self.update_visit_target_count()
 
     def update_visit_target_count(self):
-        frappe.log_info(f"Updating visit target count for {self.name}")
         # Get necessary data from the submitted visit log
-        sales_person_name = self.get("sales_person")
+		frappe.logger().info(f"Updating visit target count for {self.name}")
+        
+		sales_person_name = self.get("sales_person")
         visit_date_str = self.get("visit_date")
         customer_name = self.get("customer")
+    	
+		frappe.logger().info(f"Sales Person: {sales_person_name}, Visit Date: {visit_date_str}, Customer: {customer_name}")
 
         if not sales_person_name or not visit_date_str or not customer_name:
-            frappe.log_error(
-                f"Sales Visit Log {self.name} missing Sales Person, Visit Date, or Customer.", 
-                "Visit Target Update Failed"
-            )
+			frappe.throw("Sales Person, Visit Date, and Customer are required.")
             return
 
         visit_date = getdate(visit_date_str)
@@ -32,6 +32,7 @@ class SalesVisitLog(Document):
             target_row_found = False
 
             if not visit_targets:
+				frappe.logger().info(f"No visit targets found for {sales_person_name}")
                 return # No targets to update
 
             # Iterate through the visit target rows
@@ -40,20 +41,22 @@ class SalesVisitLog(Document):
                 start_date_str = target_row.get("start_date")
                 end_date_str = target_row.get("end_date")
 
+				frappe.logger().debug(f"Checking target row: {target_row.idx}")
+
                 # Check if this row matches the customer and date range
                 if (target_customer == customer_name and 
                     start_date_str and end_date_str):
                     
                     start_date = getdate(start_date_str)
                     end_date = getdate(end_date_str)
-
+                    frappe.logger().debug(f"target_customer == customer_name")
                     if start_date <= visit_date <= end_date:
                         # Found the matching target row, increment the count
                         current_count = target_row.get("completed_visits") or 0
                         target_row.completed_visits = current_count + 1
                         target_row_found = True
                         # Optional: Add a log message
-                        frappe.log_info(
+                        frappe.logger().info(
                             f"Incremented completed_visits for SP {sales_person_name}, Customer {customer_name}, Row {target_row.idx}",
                             "Visit Target Update"
                         )
@@ -65,8 +68,9 @@ class SalesVisitLog(Document):
                 sales_person_doc.flags.ignore_validate = True # Skip our overlap validation on this save
                 sales_person_doc.save(ignore_permissions=True) # Use ignore_permissions if needed
                 frappe.db.commit() # Ensure change is committed
+				frappe.logger().debug(f"jwna hchich")
             else:
-                 frappe.log_error(
+                 frappe.logger().error(
                     f"No matching Visit Target found for Sales Visit Log {self.name} (SP: {sales_person_name}, Customer: {customer_name}, Date: {visit_date_str})",
                     "Visit Target Update Failed"
                  )
