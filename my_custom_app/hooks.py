@@ -19,6 +19,12 @@ fixtures = [
         "filters": [
             ["dt", "=", "Sales Person"] # Filter by the DocType they belong to
         ]
+    },
+    {
+        "dt": "Workspace", 
+        "filters": [
+            ["name", "=", "Selling"]
+        ]
     }
     # Add other DocTypes here if needed
 ]
