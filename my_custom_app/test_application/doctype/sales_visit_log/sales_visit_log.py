@@ -3,6 +3,12 @@ import frappe
 from frappe.model.document import Document
 from frappe.utils import getdate
 
+# Add this module-level function for the hook
+def update_visit_target_count(doc, method=None):
+    # This gets called by the hook and delegates to the document method
+    if hasattr(doc, 'update_visit_target_count'):
+        doc.update_visit_target_count()
+
 class SalesVisitLog(Document):
     # This method will be called by the on_submit hook
     def on_submit(self):
