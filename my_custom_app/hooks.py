@@ -161,6 +161,9 @@ doctype_js = {
 doc_events = {
     "Sales Person": {
         "before_save": "my_custom_app.overrides.sales_person_validation.check_visit_target_details"
+    },
+    "Sales Visit Log": { # Add this section
+        "on_submit": "my_custom_app.test_application.doctype.sales_visit_log.sales_visit_log.on_submit"
     }
     # Remove any old entries for "Visit Target Detail" hooks if they exist
 }
