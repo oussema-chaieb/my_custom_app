@@ -17,7 +17,7 @@ fixtures = [
     {
         "dt": "Custom Field", # Add this entry
         "filters": [
-            ["dt", "=", "Sales Person"] # Filter by the DocType they belong to
+            ["dt", "in", ["Sales Person", "Item", "Landed Cost Taxes and Charges"]] # Filter by the DocTypes they belong to
         ]
     },
     {
@@ -168,10 +168,9 @@ doc_events = {
     "Sales Person": {
         "before_save": "my_custom_app.overrides.sales_person_validation.check_visit_target_details"
     },
-    # "Sales Visit Log": { # Add this section
-    #     "on_submit": "my_custom_app.test_application.doctype.sales_visit_log.sales_visit_log.update_visit_target_count"
-    # }
-    # Remove any old entries for "Visit Target Detail" hooks if they exist
+    "Landed Cost Voucher": {
+        "before_save": "my_custom_app.overrides.landed_cost_voucher.custom_distribute_charges_by_ngp"
+    }
 }
 
 # Scheduled Tasks
