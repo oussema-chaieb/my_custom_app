@@ -1,8 +1,6 @@
 frappe.ui.form.on("Visit Target Detail", {
     // Event triggered when "period_type" changes IN THIS ROW
     period_type: function(frm, cdt, cdn) {
-        console.log("Visit Target Detail Script: Period Type Changed for row:", cdn); // Log entry point
-
         let row = locals[cdt][cdn];
         let period_type = row.period_type;
         let start_date = null;
@@ -13,8 +11,6 @@ frappe.ui.form.on("Visit Target Detail", {
         // Get it from the grid object if possible, otherwise hardcode (less ideal)
         let grid = frm.fields_dict[row.parentfield]?.grid; // Get grid object via parentfield
         let child_table_fieldname = row.parentfield || "custom_number_visit_target"; // Default if needed
-
-        console.log("Visit Target Detail Script: Selected Period Type:", period_type); // Log selected type
 
         if (period_type === "Current Month") {
             start_date = today_moment.startOf("month").format("YYYY-MM-DD");
@@ -38,9 +34,6 @@ frappe.ui.form.on("Visit Target Detail", {
             read_only = 0;
         }
 
-        console.log("Visit Target Detail Script: Calculated Start Date:", start_date);
-        console.log("Visit Target Detail Script: Calculated End Date:", end_date);
-
         // Set the values in the child table row
         // Use flags to prevent immediate refresh triggering infinite loops
         frm.setting_child_value = true;
@@ -48,32 +41,26 @@ frappe.ui.form.on("Visit Target Detail", {
         frappe.model.set_value(cdt, cdn, "end_date", end_date);
         frm.setting_child_value = false;
 
-        console.log("Visit Target Detail Script: Values set for row:", cdn);
-
         // Refresh the specific row fields
         let grid_row = grid?.grid_rows_by_docname[cdn];
         if (grid_row) {
              grid_row.refresh_field("start_date");
              grid_row.refresh_field("end_date");
-             console.log("Visit Target Detail Script: Row fields refreshed for:", cdn);
         } else {
             // Fallback: Refresh the whole table on the parent form
-            console.log("Visit Target Detail Script: Refreshing parent table field:", child_table_fieldname);
             frm.refresh_field(child_table_fieldname);
         }
 
         // Set read-only status
-        console.log("Visit Target Detail Script: Attempting to set read-only status...");
         if (grid_row) {
             try {
                  grid_row.toggle_editable("start_date", !read_only);
                  grid_row.toggle_editable("end_date", !read_only);
-                 console.log("Visit Target Detail Script: Read-only status set for row:", cdn);
             } catch (e) {
-                console.error("Visit Target Detail Script: Error setting read-only status:", e);
+                console.error("Error setting read-only status:", e);
             }
         } else {
-             console.log("Visit Target Detail Script: Could not find grid row to set read-only status for row:", cdn);
+             console.log("Could not find grid row to set read-only status for row:", cdn);
         }
     },
 });
