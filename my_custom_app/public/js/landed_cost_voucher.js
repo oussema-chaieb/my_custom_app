@@ -49,8 +49,6 @@ function calculate_ngp_distribution(frm) {
         return;
     }
     
-    console.log("Running NGP distribution calculation");
-    
     // Reset applicable charges
     frm.doc.items.forEach(function(item) {
         item.applicable_charges = 0;
@@ -78,7 +76,6 @@ function calculate_ngp_distribution(frm) {
                     .then(r => {
                         if (r.message) {
                             ngpCodeCache[item_code] = r.message.custom_ngp_code;
-                            console.log(`Cached NGP code for ${item_code}: ${ngpCodeCache[item_code]}`);
                         } else {
                             ngpCodeCache[item_code] = null;
                         }
@@ -86,7 +83,6 @@ function calculate_ngp_distribution(frm) {
                 });
                 
                 Promise.all(promises).then(() => {
-                    console.log("Finished caching all NGP codes");
                     resolve();
                 });
             });
@@ -98,13 +94,11 @@ function calculate_ngp_distribution(frm) {
         promise_chain = promise_chain.then(() => {
             return new Promise((resolve) => {
                 if (!tax.amount || tax.amount <= 0) {
-                    console.log(`Skipping tax ${tax_index + 1} with zero amount`);
                     resolve();
                     return;
                 }
                 
                 let current_amount = tax.amount;
-                console.log(`Processing tax ${tax_index + 1}, amount: ${current_amount}`);
                 
                 if (tax.expense_account && tax.expense_account.toLowerCase().includes('ngp') && tax.custom_ngp_code) {
                     // NGP tax processing
@@ -123,14 +117,12 @@ function calculate_ngp_distribution(frm) {
                         if (item_ngp_code === current_ngp_code) {
                             items_with_ngp.push(item);
                             all_debug_messages.push(`Article trouvé avec NGP: ${item.item_code}`);
-                            console.log(`Matched item ${item.item_code} with NGP code ${current_ngp_code}`);
                         }
                     });
                     
                     // If no matching NGP items, skip to next tax
                     if (items_with_ngp.length === 0) {
                         all_debug_messages.push(`Aucun article trouvé pour le code NGP ${current_ngp_code}`);
-                        console.log(`No items found for NGP code ${current_ngp_code}`);
                         resolve();
                         return;
                     }
@@ -149,7 +141,6 @@ function calculate_ngp_distribution(frm) {
                     });
                     
                     if (distribution_base === 0) {
-                        console.log("Distribution base is zero, skipping");
                         resolve();
                         return;
                     }
@@ -175,7 +166,6 @@ function calculate_ngp_distribution(frm) {
                         }
                         
                         item.applicable_charges += charge;
-                        console.log(`Assigned ${charge} to item ${item.item_code} (NGP)`);
                         all_debug_messages.push(`Répartition NGP pour ${item.item_code}: ${charge}`);
                     });
                     
@@ -201,7 +191,6 @@ function calculate_ngp_distribution(frm) {
                     });
                     
                     if (distribution_base === 0) {
-                        console.log("Distribution base is zero, skipping");
                         resolve();
                         return;
                     }
@@ -227,7 +216,6 @@ function calculate_ngp_distribution(frm) {
                         }
                         
                         item.applicable_charges += charge;
-                        console.log(`Assigned ${charge} to item ${item.item_code} (standard)`);
                         all_debug_messages.push(`Répartition standard pour ${item.item_code}: ${charge}`);
                     });
                     
@@ -248,8 +236,6 @@ function calculate_ngp_distribution(frm) {
             total_applied_charges += item.applicable_charges;
             final_value += item.amount + item.applicable_charges;
         });
-        
-        console.log(`Calculation complete. Total charges: ${total_applied_charges}`);
         
         // Show a small status indicator instead of a full alert
         frappe.show_alert({
