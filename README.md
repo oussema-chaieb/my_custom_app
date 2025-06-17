@@ -2,6 +2,24 @@
 
 Let\'s try Description here
 
+## Features
+
+### Tunisia Chart of Accounts (COA) - Automatic Configuration
+
+This app includes an automatic configuration tool for Tunisian companies with the proper Chart of Accounts. When installed, it will:
+
+- Automatically import the complete Tunisia Chart of Accounts for all existing companies
+- Automatically configure all Tunisia-specific accounts for each company
+- Set up Tax Templates for all Tunisia VAT rates (19%, 13%, 7%, 0%)
+- Configure payment methods with proper account linkages
+- Set up warehouse account connections for proper inventory accounting
+
+The configuration runs automatically:
+1. For all existing companies when the app is installed
+2. For any new company when it's created
+
+No manual action is required - everything is configured automatically!
+
 ### Installation
 
 You can install this app using the [bench](https://github.com/frappe/bench) CLI:
