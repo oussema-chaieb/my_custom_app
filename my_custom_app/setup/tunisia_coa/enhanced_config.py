@@ -49,8 +49,13 @@ def import_tunisia_coa_for_company(company_name):
             # ------------------------------------------------------------------
             base_account_name = f"{account_number} - {account_name}" if account_number else account_name
 
-            # Determine if this is one of the seven root "Classe" accounts
-            is_root_classe = account_name.startswith("CLASSE") or account_name.startswith("Classe ")
+            # Determine if this line represents a root "Classe" account.
+            # It is root if the CSV shows no parent (parent_account_raw is empty) OR the label starts with "Classe" / "CLASSE".
+            is_root_classe = (not parent_account_raw) \
+                or account_name.upper().startswith("CLASSE") \
+                or account_name.upper().startswith((
+                    "1 - CLASSE", "2 - CLASSE", "3 - CLASSE",
+                    "4 - CLASSE", "5 - CLASSE", "6 - CLASSE", "7 - CLASSE"))
 
             # Append company suffix for all company-specific accounts (i.e. the
             # vast majority) but NOT for the root "Classe" nodes.
