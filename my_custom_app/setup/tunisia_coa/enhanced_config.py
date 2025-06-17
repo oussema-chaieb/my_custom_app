@@ -73,6 +73,12 @@ def import_tunisia_coa_for_company(company_name):
 
             # For root accounts (with no parent)
             if not parent_account and is_root_classe:
+                # Use the company root ("<Company> - Chart of Accounts") as parent
+                company_root = f"{company_name} - Chart of Accounts"
+                if not frappe.db.exists("Account", company_root):
+                    # Fall back to any account that has no parent for this company
+                    company_root = frappe.db.get_value(
+                        "Account", {"company": company_name, "parent_account": ""}, "name") or ""
                 try:
                     # Create root account (no company suffix)
                     root_account = frappe.get_doc({
@@ -83,7 +89,8 @@ def import_tunisia_coa_for_company(company_name):
                         "is_group": 1,
                         "company": company_name,
                         "account_number": account_number,
-                        "account_currency": account_currency
+                        "account_currency": account_currency,
+                        "parent_account": company_root
                     })
                     root_account.insert(ignore_permissions=True)
                 except Exception as e:
