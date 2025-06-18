@@ -14,10 +14,13 @@ website_context = {
 }
 
 # Installation
-# after_install = "my_custom_app.install.after_install"
+# after_install = ""
 
 # After Migration
-after_migrate = "my_custom_app.install.after_install"
+after_migrate = [
+    "my_custom_app.install.after_install",
+    "my_custom_app.setup.tunisia_coa.import_coa.import_chart_for_all_companies",
+]
 
 fixtures = [
     {
@@ -177,10 +180,6 @@ doc_events = {
     "Landed Cost Voucher": {
         "before_save": "my_custom_app.overrides.landed_cost_voucher.custom_distribute_charges_by_ngp",
         "before_submit": "my_custom_app.overrides.landed_cost_voucher.custom_distribute_charges_by_ngp"
-    },
-    # Add hook for Company creation to auto-setup Tunisia COA
-    "Company": {
-        "after_insert": "my_custom_app.setup.tunisia_coa.enhanced_config.auto_setup_tunisia_for_new_company"
     }
 }
 
