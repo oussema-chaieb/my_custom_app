@@ -45,6 +45,17 @@ def _ensure_parent(account_row: Dict[str, str], mapping: Dict[str, str], company
                 "name",
             )
 
+        # If still missing, create a minimal root account on the fly
+        if not root_account:
+            root_doc = frappe.get_doc({
+                "doctype": "Account",
+                "account_name": "All Accounts",
+                "company": company,
+                "is_group": 1,
+            })
+            root_doc.insert(ignore_if_duplicate=True)
+            root_account = root_doc.name
+
         # Should always exist, but guard just in case
         if not root_account:
             frappe.throw(
