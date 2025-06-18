@@ -14,7 +14,10 @@ website_context = {
 }
 
 # Installation
-after_install = "my_custom_app.install.after_install"
+# after_install = "my_custom_app.install.after_install"
+
+# After Migration
+after_migrate = "my_custom_app.install.after_install"
 
 fixtures = [
     {
