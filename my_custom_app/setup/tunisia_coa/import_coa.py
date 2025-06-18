@@ -24,15 +24,27 @@ def _ensure_parent(account_row: Dict[str, str], mapping: Dict[str, str], company
         if "__root__" in mapping:
             return mapping["__root__"]
 
+        # Try the canonical "All Accounts" first
         root_account = frappe.db.get_value(
             "Account",
             {
                 "company": company,
                 "account_name": "All Accounts",
-                "is_group": 1,
             },
             "name",
         )
+
+        # Fallback: any account without a parent (root of the tree)
+        if not root_account:
+            root_account = frappe.db.get_value(
+                "Account",
+                {
+                    "company": company,
+                    "parent_account": ["in", (None, "")],
+                },
+                "name",
+            )
+
         # Should always exist, but guard just in case
         if not root_account:
             frappe.throw(
