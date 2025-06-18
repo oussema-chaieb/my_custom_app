@@ -2,6 +2,7 @@ import csv
 from typing import Dict, List, Any
 
 import frappe
+from frappe import _
 
 CSV_FILENAME = "tunisia_coa.csv"
 
@@ -16,8 +17,29 @@ def _get_csv_rows() -> List[Dict[str, Any]]:
 def _ensure_parent(account_row: Dict[str, str], mapping: Dict[str, str], company: str):
     """Make sure the parent account exists and return its full name (or None)."""
     parent_name = account_row.get("Parent Account")
+    # If there is no explicit parent in CSV, we attach the account directly under the
+    # company's "All Accounts" root. This is how ERPNext's bundled importer behaves.
     if not parent_name:
-        return None
+        # Cache root to avoid repeated DB calls
+        if "__root__" in mapping:
+            return mapping["__root__"]
+
+        root_account = frappe.db.get_value(
+            "Account",
+            {
+                "company": company,
+                "account_name": "All Accounts",
+                "is_group": 1,
+            },
+            "name",
+        )
+        # Should always exist, but guard just in case
+        if not root_account:
+            frappe.throw(
+                _(f"Root account 'All Accounts' not found for company {company}.")
+            )
+        mapping["__root__"] = root_account
+        return root_account
 
     # Parent should have already been created since CSV is in hierarchical order
     full_parent = mapping.get(parent_name)
