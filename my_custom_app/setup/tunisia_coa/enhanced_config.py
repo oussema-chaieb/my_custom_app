@@ -73,12 +73,27 @@ def import_tunisia_coa_for_company(company_name):
 
             # For root accounts (with no parent)
             if not parent_account and is_root_classe:
-                # Use the company root ("<Company> - Chart of Accounts") as parent
-                company_root = f"{company_name} - Chart of Accounts"
-                if not frappe.db.exists("Account", company_root):
-                    # Fall back to any account that has no parent for this company
-                    company_root = frappe.db.get_value(
-                        "Account", {"company": company_name, "parent_account": ""}, "name") or ""
+                # Try most common ERPNext naming patterns
+                possible_roots = [
+                    company_name,  # default ERPNext pattern
+                    f"Chart of Accounts - {company_name}"
+                ]
+
+                # Pick the first existing one
+                company_root = next((acc for acc in possible_roots if frappe.db.exists("Account", acc)), "")
+
+                # If still not found, create a company root on-the-fly
+                if not company_root:
+                    root_doc = frappe.get_doc({
+                        "doctype": "Account",
+                        "account_name": company_name,
+                        "company": company_name,
+                        "is_group": 1,
+                        "root_type": "",
+                        "parent_account": ""
+                    })
+                    root_doc.insert(ignore_permissions=True)
+                    company_root = root_doc.name
                 try:
                     # Create root account (no company suffix)
                     root_account = frappe.get_doc({
