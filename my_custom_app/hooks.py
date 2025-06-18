@@ -17,10 +17,7 @@ website_context = {
 # after_install = ""
 
 # After Migration
-after_migrate = [
-    "my_custom_app.install.after_install",
-    "my_custom_app.setup.tunisia_coa.import_coa.import_chart_for_all_companies",
-]
+# after_migrate = ""
 
 fixtures = [
     {
